@@ -1,0 +1,16 @@
+{% extends 'home/base.html'%}
+
+{% block content %}
+<h1>
+    MY APPS 
+</h1>
+
+<br/>
+<li>
+    <a href="{% url 'ttt' %}">Tic Tac Toe</a>
+</li>
+<li>
+    <a href="{% url 'phonebook' %}">Phonebook</a>
+</li>
+
+{% endblock %}
