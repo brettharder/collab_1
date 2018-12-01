@@ -5,24 +5,49 @@
     Phonebook
 </h1>
 
-<div id="addContactDiv">
-<form method="POST" id="newcontact" onsubmit="return addContact(event)">
+<h3>Add contact with regular form</h3>
+<div id="addContactDiv1">
+<form method="POST" id="newcontact1" autocomplete="off">
 {% csrf_token %}
-contact name:
-<input id="newContactName" type = "text" name = "newContactName">
+Name:
+<input id="newContactName1" type = "text" name = "newContactName1">
 Phone Number:
-<input id="newContactNumber" type = "text" name = "newContactNumber">
+<input id="newContactNumber1" type = "text" name = "newContactNumber1">
 <input type="submit" value="Submit">
 </form>
-
 </div>
 
+</br>
+<h3>Add contact with AJAX form</h3>
+<div id="addContactDiv2">
+<form method="POST" id="newcontact2" autocomplete="off" onsubmit="return addContact(event)">
+{% csrf_token %}
+Name:
+<input id="newContactName2" type = "text" name = "newContactName2">
+Phone Number:
+<input id="newContactNumber2" type = "text" name = "newContactNumber2">
+<input type="submit" value="Submit">
+</form>
+</div>
+
+</br>
 {% if contacts %}
-<ul>
+<h3>Contacts: </h3>
+<table class="table">
+    <tr>
+      <th>Name</th>
+      <th>Phone Number</th>
+      <th>Delete</th> 
+    </tr>
+    
     {% for p in contacts %}
-    <li>{{p.name}} {{p.number}}</li>
+    <tr>
+        <td>{{p.name}}</td>
+        <td>{{p.number}}</td> 
+        <td><a href="" style="color:red;" onclick="return deleteContact(event, '{{p.id}}')">X</a></td>
+    </tr>
     {% endfor %}
-</ul>
+  </table>
 {% endif %}
 
 {% endblock %}
@@ -30,8 +55,42 @@ Phone Number:
 {%block extra_js%}
 <script>
 function addContact(e){
-    consol.log("it works!");
+    e.preventDefault();
+    console.log("Add this!");
+    $.ajax({
+    type: "POST",
+    data: {
+        'newContactName2': $('#newContactName2').val(),
+        'newContactNumber2':$('#newContactNumber2').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+    },
+    success: function(response){
+        $.get("/phonebook/", function(data){
+            $('body').html(data);
+        });
     }
+    });
+}
+
+function deleteContact(e, tid){
+    e.preventDefault();
+    console.log("Delete this! "+tid);
+    var conf=confirm("Are you sure you want to delete this contact?")
+    if(conf){
+        $.ajax({
+        type: "GET",
+        data: {
+            'deleteContact': tid
+        },
+        success: function(response){
+            $.get("/phonebook/", function(data){
+                $('body').html(data);
+            });
+        }
+        });
+    }
+
+}    
 </script>
 {%endblock%}
     
